@@ -2,8 +2,8 @@
 #include<string>
 #include <conio.h>
 #include <windows.h>
-#include "Spaceship.h"
 #include "Bullet.h"
+#include <vector>
 
 using namespace std;
 
@@ -21,22 +21,23 @@ class Player
         string sprite [4] = {"______||______\n","\\____    ____/\n","     \\  /\n","      \\/\n"};
         Point start;
         const int mSpeed = 5;
-        const int WIDTH = 300, HEIGHT = 300, UPPER_LIMIT = 0;
+        static const int WIDTH = 200, HEIGHT = 60, UPPER_LIMIT = 0;
+        vector<Bullet> bullets;
 
     public:
-        Player(int x, int y)
+        Player(){}
+
+        void setStart(int x, int y)
         {
             start = Point(x, y);
         }
 
         void gotoxy(int x,int y)
         {  
-            HANDLE hcon;  
-            hcon = GetStdHandle(STD_OUTPUT_HANDLE);  
-            COORD dwPos;  
-            dwPos.X = x;  
-            dwPos.Y= y;  
-            SetConsoleCursorPosition(hcon,dwPos);  
+            COORD coord;
+            coord.X = x;
+            coord.Y = y;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         }
 
         void draw()
@@ -67,10 +68,40 @@ class Player
             }
         }
 
-        void shoot()
+        bool shoot(Spaceship enemy)
         {
+            int index = bullets.size()-1;
+            bool end = false, hit = false;
             Bullet shot = Bullet(start.getX() + 6, start.getY() -1);
-            shot.travel();
+            bullets.push_back(shot);
+            while(!shot.end() && !shot.hit(enemy.getHitBox()))
+            {
+                shot.travel();
+                draw();              
+                if(shot.hit(enemy.getHitBox()))
+                {
+                    hit = true;
+                    break;
+                }
+
+                if(shot.end())
+                {
+                    end = true;
+                    break;
+                }
+
+                Sleep(50);
+                system("cls");
+            }
+
+            system("cls");
+            draw();
+
+            bullets.erase(bullets.begin() + index);
+            if(hit)
+                return true;
+            else   
+                return false;
         }
 
         bool outOfBounds()
@@ -82,5 +113,10 @@ class Player
                 return true;
 
             return false;
+        }
+
+        void bury()
+        {
+            start = Point(0, 0);
         }
 };

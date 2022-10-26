@@ -17,34 +17,36 @@ class Spaceship
 {
     private:
         map<int, vector<string>> sprites;
+        map<int, Point> dimensions;
         vector<string> smallE = {"    __\n", "____\\/____\n", "\\___  ___/\n", "    \\/\n"};
         vector<string> medium = {"      ____\n", "      \\  /\n","_______\\/_______\n", "\\______  ______/\n", "   |   \\/   |\n"};
         vector<string> big = {"         ______\n", "         \\    /\n", "          \\  /\n", "___________\\/___________\n", "\\                      /\n", " \\                    /\n", "  \\______      ______/\n", "     |    \\  /    |\n", "           \\/"};
-        int size, score, mSpeed = 1;
+        
+        Point dimSmall = Point(10, 4);
+        Point dimMedium = Point(16, 5);
+        Point dimBig = Point(24, 9);
+
+        int size, score, mSpeed, dX, dY;
         Point start;
         bool dead;
         vector<string> sprite;
         int values[3] = {500, 250, 150};
-        const int WIDTH = 300, HEIGHT = 100, UPPER_LIMIT = 0;
+        static const int WIDTH = 200, HEIGHT = 60, UPPER_LIMIT = 0;
+        HitBox hitBox;
 
         void createMap()
         {
             sprites.insert(pair<int, vector<string>> (SMALL, smallE));
             sprites.insert(pair<int, vector<string>> (MEDIUM, medium));
             sprites.insert(pair<int, vector<string>> (BIG, big));
+
+            dimensions.insert(pair<int, Point> (SMALL, dimSmall));
+            dimensions.insert(pair<int, Point> (MEDIUM, dimMedium));
+            dimensions.insert(pair<int, Point> (BIG, dimBig));
         }
 
     public: 
-        Spaceship()
-        {
-            srand(time(NULL));
-            createMap();
-            size = rand()%3;
-            sprite = sprites.find(size)->second;
-            score = values[size];
-            start = Point(9 + (rand()%80), 1);
-            dead = false;
-        }
+        Spaceship(){}
 
         Spaceship(int size)
         {
@@ -53,53 +55,83 @@ class Spaceship
             this->size = size;
             sprite = sprites.find(size)->second;
             score = values[size];
-            start = Point(9 + (rand()%80), 1);
+            start = Point(9 + (rand()%130), 1);
+
+            switch(size)
+            {
+                case 0:
+                    mSpeed = 3;
+                    break;
+                case 1: 
+                    mSpeed = 2;
+                    break;
+                case 2:
+                    mSpeed = 1;
+                    break;
+            }
             dead = false;
+            hitBox = HitBox(start.getX(), start.getX() + dimensions.find(size)->second.getX(), start.getY(), start.getY() + dimensions.find(size)->second.getY());
         }
 
-        void setMSpeed(int mSpeed)
+        void bury()
         {
-            this->mSpeed = mSpeed;
+            start = Point(-1, -1);
+            hitBox = HitBox(-1, -1, -1, -1);
         }
 
         void gotoxy(int x,int y)
         {  
-            HANDLE hcon;  
-            hcon = GetStdHandle(STD_OUTPUT_HANDLE);  
-            COORD dwPos;  
-            dwPos.X = x;  
-            dwPos.Y= y;  
-            SetConsoleCursorPosition(hcon,dwPos);  
+            COORD coord;
+            coord.X = x;
+            coord.Y = y;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         }
 
         void draw()
         {
-            system("cls");
-            for(int i=0; i<sprite.size(); i++)
+            if(!dead)
             {
-                gotoxy(start.getX(), start.getY()+i);
-                cout << sprite[i];
+                for(int i=0; i<sprite.size(); i++)
+                {
+                    gotoxy(start.getX(), start.getY()+i);
+                    cout << sprite[i];
+                }
             }
         }
 
         void move()
         {
-            while(start.getY() < HEIGHT && dead == false)
+            if(!dead)
             {
                 gotoxy(start.getX(), start.getY());
                 draw();
                 start.moveY(mSpeed);
-                Sleep(10);
+                hitBox.moveHB(mSpeed);
             }
         }
 
-        
+        HitBox getHitBox()
+        {
+            return hitBox;
+        }
+
+        void gotShot()
+        {
+            dead = true;
+        }
+
+        bool isDead()
+        {
+            return dead;
+        }
 
         int giveScore()
         {
-            if(dead)
-                return score;
-            else 
-                return 0;
+            return score;
+        }
+
+        bool reachEnd()
+        {
+            return (start.getY() > HEIGHT);
         }
 };

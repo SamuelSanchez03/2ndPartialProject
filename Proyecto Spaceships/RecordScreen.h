@@ -5,44 +5,41 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <conio.h>
 
 using namespace std;
 
+#define KEY_RETURN 0x0D
+
 class RecordScreen
 {
-    private:
-        ifstream reader;
-        ofstream writer;
         
     public:
-        RecordScreen()
-        {
-            reader.open("Records.txt", ios::in);
-            writer.open("Records.txt", ios::app);
-        }
-
-        ~RecordScreen()
-        {
-            reader.close();
-            writer.close();
-        }
+        
+        RecordScreen(){}
 
         void print()
         {
             string line;
-            
+            int index = 0;
+            ifstream reader;
+            reader.open("Records.txt", ios::in);
             cout << "-----------HIGHEST SCORES-----------\n";
-            for(int i=0; i<5; i++)
+            while(index < 5 && !reader.eof())
             {
                 getline(reader, line);
-                cout << i+1 << "\t" << line << endl;
+                cout << index+1 << "\t" << line << endl;
+                index++;
             }
+            reader.close();
+
+            cout << "\n\n\n\nPress Enter to Go Back\n";
         }
 
         vector<string> split(string s, char regex)
         {
             vector<string> res;
-            string aux;
+            string aux = "";
             for(int i=0; i<s.length(); i++)
             {
                 if(s[i] != regex)
@@ -53,18 +50,18 @@ class RecordScreen
                     aux = "";
                 }
             }
-            res.push_back(aux);
             return res;
         }
 
         int getNumericValue(string line)
         {
             int index = line.length()-1;
-            string aux = "";
+            string aux = "", aux2 = "";
             
             while(line[index] != ' ')
             {
-                aux += line[index];
+                aux2 = aux;
+                aux = line[index] + aux;
                 index--;
             }
 
@@ -73,15 +70,23 @@ class RecordScreen
 
         void modify(string nickname, int score)
         {
-            string bu = "", aux, newValue = nickname + "" + to_string(score);
+            ifstream reader;
+            ofstream writer;
+            reader.open("Records.txt", ios::in);
+
+            string bu = "", aux, newValue = nickname + " " + to_string(score);
             vector<string> scores;
             while(!reader.eof())
             {
                 getline(reader, aux);
-                bu += aux;
+
+                bu += aux + "\n";
             }
             scores = split(bu, '\n');
             int values [scores.size()];
+
+            if(scores[scores.size()-1] == "\n")
+                scores.pop_back();
 
             for(int i=0; i<scores.size(); i++)
             {
@@ -94,14 +99,33 @@ class RecordScreen
                 scores.push_back(newValue);
             else
             {
-                for(int i = scores.size()-2; i>=0; i--)
+                for(int i = 1; i<scores.size()-1; i++)
                 {
-                    if(score < values[i])
+                    if(score > values[i])
                     {
-                        scores.insert(scores.begin()+i+1, newValue);
+                        scores.insert(scores.begin()+i, newValue);
                         break;
                     }
                 }
             }
+
+            writer.open("Records.txt");
+
+            for(auto it = scores.begin(); it != scores.end(); it++)
+            {
+                if(it != scores.begin())
+                    writer << endl;
+                writer << *it;
+            }
+
+            writer.close();
+        }
+
+        int selection(int c)
+        {
+            if(c = getch() == KEY_RETURN)
+                return 1;
+            else 
+                return 0;
         }
 };

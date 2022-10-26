@@ -6,61 +6,86 @@
 #include <pthread.h>
 #include "Player.h"
 #include "RecordScreen.h"
+#include "FinalScreen.h"
+#include <signal.h>
 
 using namespace std;
 
 #define KEY_SPACE 0x20
 
-Player player = Player(10, 10);
+Player player = Player();
+Spaceship enemy;
+int score = 0, enemyCount = 0;
+char result = 'U';
+
 
 void *bullet (void* args)
 {
-    player.shoot();
+    if(player.shoot(enemy))
+        enemy.gotShot();
 
     pthread_exit(NULL);
 }
 
-void *printing (void* args)
-{
-    while(true)
-        player.draw();
-}
-
 void *pMovement (void* args)
 {
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_t shooting;
     int resS;
     int c;
-    while(true)
+    while(result == 'U')
     {
+        system("cls");
         player.draw();
         c = getch();
         if(c != KEY_SPACE)
             player.move(getch());
         else    
-        {
             resS = pthread_create(&shooting, NULL, bullet, NULL);
-        }
 
         system("cls");
-        
-        if(player.outOfBounds())
-            break;
     }
+
+    player.bury();
     pthread_exit(NULL);
 }
 
 void *eMovement(void* args)
 {
-    Spaceship enemy = Spaceship(3);
-    enemy.move();
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    int size = 2;
+    if(enemyCount > 2)
+        size--;
+    if(enemyCount > 5)
+        size--;
+    enemy = Spaceship(size); 
+    while(!enemy.isDead() && !enemy.reachEnd())
+    {
+        enemy.move();
+        player.draw();
+        Sleep(30);
+        system("cls");
+    }
+
+    if(enemy.isDead())
+    {
+        enemy.bury();
+        score += enemy.giveScore();
+        enemyCount++;
+        return (void*)1;
+    }
+    
+    if(enemy.reachEnd())
+    {
+        return (void*)0;
+    }
     pthread_exit(NULL);
 }
 
 int main()
 {
-    int sel = -1, res, res2, score, res3;
-    bool end = false;
+    int sel = -1, res, res2, enemyLimit = 5;
+    void* resEnemy = (void*)1;
     string nickname;
 
     system("cls");
@@ -68,33 +93,64 @@ int main()
     cin >> nickname;
     system("cls");
     cout << "Welcome " << nickname << endl;
-    system("pause");
+    Sleep(1000);
 
     TitleScreen tscreen = TitleScreen();
-    RecordScreen recordScreen;
+    RecordScreen recordScreen = RecordScreen();
+    FinalScreen finalScreen = FinalScreen();
 
-    pthread_t pM, enemies[4], print;
+    pthread_t pM, enemies, print;
 
-    system("cls");
-    while(true)
+    while(sel == -1)
     {
-        tscreen.print();
+    beginning:
+        tscreen.print(nickname);
         sel = tscreen.selection(0);
         system("cls");
-        if(sel != -1)
-          break;
     }
 
     if(sel == 0)
     {
-        //res3 = pthread_create(&print, NULL, printing, NULL);
-        res = pthread_create(&pM, NULL, pMovement, NULL);
-        //for(int i=0; i<4; i++)
-            //res2 = pthread_create(&enemies[i], NULL, eMovement, NULL);
+        result = 'U';
+        score = 0, enemyCount = 0, resEnemy = (void*)1;
+        player.setStart(75, 60);
+        res = pthread_create(&pM, NULL, &pMovement, NULL);
+        while((int)resEnemy != 0 && enemyCount <= enemyLimit)
+        {
+            res2 = pthread_create(&enemies, NULL, &eMovement, NULL);
+            pthread_join(enemies, &resEnemy);
+        }
+
+        pthread_cancel(pM);
+        pthread_cancel(enemies);
+
+        if((int)resEnemy == 0)
+            result = 'L';
+        if(enemyCount >= enemyLimit)
+            result = 'W';
+
+        recordScreen.modify(nickname, score);
+        int selF = 0;
+        while(selF == 0)
+        {
+            finalScreen.printResult(result, score);
+            selF = finalScreen.selection(0);
+            system("cls");
+        }
+        sel = -1;
+        goto beginning;
     }
     else if(sel == 1)
     {
-        //recordScreen = RecordScreen();
+        int selR = 0;
+        while(selR == 0)
+        {
+            recordScreen.print();
+            selR = recordScreen.selection(0);
+            system("cls");
+        }
+        sel = -1;
+        goto beginning;
     }
 
     pthread_exit(NULL);

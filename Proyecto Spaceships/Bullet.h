@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include "Spaceship.h"
 
 using namespace std;
 
@@ -7,9 +8,10 @@ class Bullet
 {
     private:
         int x, y;
-        const int B_SPEED = 1, DELAY = 10;
+        static const int B_SPEED = 1, DELAY = 10;
 
     public:
+        Bullet(){}
         Bullet(int x, int y)
         {
             this->x = x;
@@ -18,23 +20,26 @@ class Bullet
 
         void gotoxy(int x,int y)
         {  
-            HANDLE hcon;  
-            hcon = GetStdHandle(STD_OUTPUT_HANDLE);  
-            COORD dwPos;  
-            dwPos.X = x;  
-            dwPos.Y= y;  
-            SetConsoleCursorPosition(hcon,dwPos);  
+            COORD coord;
+            coord.X = x;
+            coord.Y = y;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         }
 
         void travel()
         {
-            while(y >= 0)
-            {
-                gotoxy(x, y);
-                cout << "||\n";
-                Sleep(DELAY);
-                y -= B_SPEED;
-                system("cls");
-            }
+            gotoxy(x, y);
+            cout << "||\n";
+            y -= B_SPEED;
+        }
+
+        bool hit(HitBox hB)
+        {
+            return (hB.pointInside(Point(x, y)));
+        }
+
+        bool end()
+        {
+            return (y < 0);
         }
 };
