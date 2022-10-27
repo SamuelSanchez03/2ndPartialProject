@@ -8,6 +8,7 @@
 #include "RecordScreen.h"
 #include "FinalScreen.h"
 #include <signal.h>
+#include <time.h>
 
 using namespace std;
 
@@ -97,6 +98,7 @@ void *eMovement(void* args)
 
 int main()
 {
+    srand(time(NULL));
     int sel = -1, res, res2, enemyLimit = 14;
     void* resEnemy = (void*)1;
     string nickname;
