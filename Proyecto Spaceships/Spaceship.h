@@ -31,7 +31,7 @@ class Spaceship
         bool dead;
         vector<string> sprite;
         int values[3] = {500, 250, 150};
-        static const int WIDTH = 200, HEIGHT = 60, UPPER_LIMIT = 0;
+        static const int WIDTH = 135, HEIGHT = 30, UPPER_LIMIT = 20;
         HitBox hitBox;
 
         void createMap()

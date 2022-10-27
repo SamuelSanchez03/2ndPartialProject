@@ -21,7 +21,7 @@ class Player
         string sprite [4] = {"______||______\n","\\____    ____/\n","     \\  /\n","      \\/\n"};
         Point start;
         const int mSpeed = 5;
-        static const int WIDTH = 200, HEIGHT = 60, UPPER_LIMIT = 0;
+        static const int WIDTH = 135, HEIGHT = 30, UPPER_LIMIT = 20;
         vector<Bullet> bullets;
 
     public:
@@ -54,16 +54,16 @@ class Player
             switch(c)
             {
                 case KEY_UP:
-                    start.moveY(-mSpeed);
+                    (!outOfBounds(0)) ? start.moveY(-mSpeed) : start.moveY(0);
                     break;
                 case KEY_DOWN:
-                    start.moveY(mSpeed);
+                    (!outOfBounds(1)) ? start.moveY(mSpeed) : start.moveY(0);
                     break;
                 case KEY_RIGHT:
-                    start.moveX(mSpeed);
+                    (!outOfBounds(2)) ? start.moveX(mSpeed) : start.moveX(0);
                     break;
                 case KEY_LEFT:
-                    start.moveX(-mSpeed);
+                    (!outOfBounds(3)) ? start.moveX(-mSpeed) : start.moveX(0);
                     break;
             }
         }
@@ -104,13 +104,30 @@ class Player
                 return false;
         }
 
-        bool outOfBounds()
+        bool outOfBounds(int dir)
         {
-            if(start.getX() < 0 || start.getX() > WIDTH)
-                return true;
-            
-            if(start.getY() < UPPER_LIMIT || start.getY() > HEIGHT)
-                return true;
+            switch(dir)
+            {
+                case 0:
+                    if(start.getY()-mSpeed < UPPER_LIMIT) 
+                        return true;
+                    break;
+                case 1:
+                    if(start.getY()+mSpeed > HEIGHT) 
+                        return true;
+                    break;
+                case 2:
+                    if(start.getX()+mSpeed > WIDTH) 
+                        return true;
+                    break;
+                case 3:
+                    if(start.getX()-mSpeed < 0) 
+                        return true;
+                    break;
+                default:
+                    return false;
+                    break;
+            }
 
             return false;
         }

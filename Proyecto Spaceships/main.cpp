@@ -63,7 +63,7 @@ void *eMovement(void* args)
     {
         enemy.move();
         player.draw();
-        Sleep(30);
+        Sleep(300);
         system("cls");
     }
 
@@ -84,7 +84,7 @@ void *eMovement(void* args)
 
 int main()
 {
-    int sel = -1, res, res2, enemyLimit = 5;
+    int sel = -1, res, res2, enemyLimit = 14;
     void* resEnemy = (void*)1;
     string nickname;
 
@@ -113,8 +113,9 @@ int main()
     {
         result = 'U';
         score = 0, enemyCount = 0, resEnemy = (void*)1;
-        player.setStart(75, 60);
+        player.setStart(65, 30);
         res = pthread_create(&pM, NULL, &pMovement, NULL);
+        //pthread_join(pM, NULL);
         while((int)resEnemy != 0 && enemyCount <= enemyLimit)
         {
             res2 = pthread_create(&enemies, NULL, &eMovement, NULL);
@@ -137,6 +138,7 @@ int main()
             selF = finalScreen.selection(0);
             system("cls");
         }
+        enemyCount = 0;
         sel = -1;
         goto beginning;
     }
