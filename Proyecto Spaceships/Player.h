@@ -21,7 +21,7 @@ class Player
         string sprite [4] = {"______||______\n","\\____    ____/\n","     \\  /\n","      \\/\n"};
         Point start;
         const int mSpeed = 5;
-        static const int WIDTH = 135, HEIGHT = 30, UPPER_LIMIT = 20;
+        static const int WIDTH = 135, HEIGHT = 40, UPPER_LIMIT = 30;
         vector<Bullet> bullets;
 
     public:

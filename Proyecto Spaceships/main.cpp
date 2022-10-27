@@ -71,14 +71,14 @@ void *eMovement(void* args)
     int size = 2;
     if(enemyCount > 2)
         size--;
-    if(enemyCount > 5)
+    if(enemyCount > 6)
         size--;
     enemy = Spaceship(size); 
     while(!enemy.isDead() && !enemy.reachEnd())
     {
         enemy.move();
         player.draw();
-        Sleep(300);
+        Sleep(350);
         system("cls");
     }
 
@@ -102,7 +102,7 @@ void *eMovement(void* args)
 int main()
 {
     srand(time(NULL));
-    int sel = -1, res, res2, enemyLimit = 14;
+    int sel = -1, res, res2, enemyLimit = 15;
     void* resEnemy = (void*)1;
     string nickname;
 
@@ -131,7 +131,7 @@ int main()
     {
         result = 'U';
         score = 0, enemyCount = 0, resEnemy = (void*)1;
-        player.setStart(65, 30);
+        player.setStart(65, 35);
         try
         {
             res = pthread_create(&pM, NULL, &pMovement, NULL);

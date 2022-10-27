@@ -31,7 +31,7 @@ class Spaceship
         bool dead;
         vector<string> sprite;
         int values[3] = {500, 250, 150};
-        static const int WIDTH = 135, HEIGHT = 30, UPPER_LIMIT = 20;
+        static const int WIDTH = 135, HEIGHT = 40, UPPER_LIMIT = 30;
         HitBox hitBox;
 
         void createMap()
@@ -50,7 +50,7 @@ class Spaceship
 
         Spaceship(int size)
         {
-            srand(time(NULL));
+            srand(time(0));
             createMap();
             this->size = size;
             sprite = sprites.find(size)->second;
