@@ -18,6 +18,19 @@ Spaceship enemy;
 int score = 0, enemyCount = 0;
 char result = 'U';
 
+class thread_not_created_properly_Exception : public exception
+{
+    public:
+        virtual const char* what() const throw(){
+            return "Thread couldn't be created correctly\n";
+        }
+};
+
+void checkThreadCreation(int r)
+{
+    if(r != 0)
+        throw thread_not_created_properly_Exception();
+}
 
 void *bullet (void* args)
 {
@@ -114,11 +127,27 @@ int main()
         result = 'U';
         score = 0, enemyCount = 0, resEnemy = (void*)1;
         player.setStart(65, 30);
-        res = pthread_create(&pM, NULL, &pMovement, NULL);
+        try
+        {
+            res = pthread_create(&pM, NULL, &pMovement, NULL);
+            checkThreadCreation(res);
+        }
+        catch(thread_not_created_properly_Exception &e)
+        {
+            cout << e.what() << endl;
+        }
         //pthread_join(pM, NULL);
         while((int)resEnemy != 0 && enemyCount <= enemyLimit)
         {
-            res2 = pthread_create(&enemies, NULL, &eMovement, NULL);
+            try
+            {
+                res2 = pthread_create(&enemies, NULL, &eMovement, NULL);
+                checkThreadCreation(res2);
+            }
+            catch(thread_not_created_properly_Exception &e)
+            {
+                cout << e.what() << endl;
+            }
             pthread_join(enemies, &resEnemy);
         }
 

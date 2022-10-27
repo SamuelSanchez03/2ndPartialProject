@@ -11,6 +11,16 @@ using namespace std;
 
 #define KEY_RETURN 0x0D
 
+class file_not_opened_properly : public exception
+{
+    public:
+        virtual const char* what() const throw()
+        {
+            return "File couldn't be open correctly\n";
+        }
+};
+
+
 class RecordScreen
 {
         
@@ -18,12 +28,27 @@ class RecordScreen
         
         RecordScreen(){}
 
+        void checkFile(bool o)
+        {
+            if(o)
+                throw file_not_opened_properly();
+        }
+
         void print()
         {
             string line;
             int index = 0;
             ifstream reader;
-            reader.open("Records.txt", ios::in);
+            try
+            {
+                reader.open("Records.txt", ios::in);
+                checkFile(reader.fail());
+            }
+            catch(file_not_opened_properly &e)
+            {
+                cout << e.what() << endl;
+            }
+
             cout << "-----------HIGHEST SCORES-----------\n";
             while(index < 5 && !reader.eof())
             {
@@ -72,7 +97,16 @@ class RecordScreen
         {
             ifstream reader;
             ofstream writer;
-            reader.open("Records.txt", ios::in);
+            
+            try
+            {
+                reader.open("Records.txt", ios::in);
+                checkFile(reader.fail());
+            }
+            catch(file_not_opened_properly &e)
+            {
+                cout << e.what() << endl;
+            }
 
             string bu = "", aux, newValue = nickname + " " + to_string(score);
             vector<string> scores;
@@ -109,7 +143,15 @@ class RecordScreen
                 }
             }
 
-            writer.open("Records.txt");
+            try
+            {
+                writer.open("Records.txt");
+                checkFile(writer.fail());
+            }
+            catch(file_not_opened_properly &e)
+            {
+                cout << e.what() << endl;
+            }
 
             for(auto it = scores.begin(); it != scores.end(); it++)
             {
