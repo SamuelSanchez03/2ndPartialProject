@@ -18,6 +18,7 @@ Player player = Player();
 Spaceship enemy;
 int score = 0, enemyCount = 0;
 char result = 'U';
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 class thread_not_created_properly_Exception : public exception
 {
@@ -85,7 +86,9 @@ void *eMovement(void* args)
     {
         enemy.bury();
         score += enemy.giveScore();
+        pthread_mutex_lock(&mutex);
         enemyCount++;
+        pthread_mutex_unlock(&mutex);
         return (void*)1;
     }
     
@@ -138,13 +141,14 @@ int main()
         {
             cout << e.what() << endl;
         }
-        //pthread_join(pM, NULL);
+
         while((int)resEnemy != 0 && enemyCount <= enemyLimit)
         {
             try
             {
                 res2 = pthread_create(&enemies, NULL, &eMovement, NULL);
                 checkThreadCreation(res2);
+                pthread_cancel(enemies);
             }
             catch(thread_not_created_properly_Exception &e)
             {
