@@ -1,7 +1,7 @@
 # 2nd Partial Project: Spaceships Console Videogame
 
 My project consists of a mini spaceship videogame that can be run in the windows console. 
-Every time you run the game, you have to enter a nickname to register the scores.
+Every time the game is run, the player has to enter a nickname to register the scores.
 There’s a menu at the start where the player chooses between *Play* and *Records*.
 
 ## Records
