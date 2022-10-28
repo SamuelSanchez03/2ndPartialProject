@@ -14,6 +14,11 @@ If the player chose *Play*, the game starts and the player controls through the 
 There are three sizes of enemy spaceships, each of them rewards the player with a different score upon elimination and move at different speeds. The biggest one gives 150 points and moves one row each time, the medium one gives 250 points and moves two rows at the time, and the smallest one gives 500 points and moves three rows at the time.
 The game ends when the player killed all the enemies or one of the enemies reach the bottom of the screen. 
 
+## How to play
+
+If you want to play the game yourself, you only need to download two files: main.exe and Records.txt. Run the .exe file and you are good to go. 
+*Note*: Both files need to be in the same folder.
+
 ## Link to the Explanation Video
 
 https://youtu.be/wMC9v_pTmdM
