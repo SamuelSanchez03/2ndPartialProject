@@ -15,4 +15,5 @@ There are three sizes of enemy spaceships, each of them rewards the player with 
 The game ends when the player killed all the enemies or one of the enemies reach the bottom of the screen. 
 
 ## Link to the Explanation Video
-https://drive.google.com/file/d/1nVzEhfZSDnbK7wqvDRd3bFPAA4pvkZyB/view?usp=sharing
+
+https://youtu.be/wMC9v_pTmdM
